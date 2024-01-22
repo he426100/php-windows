@@ -107,7 +107,7 @@ print_r($window->getAllTitles());
     BOOL EnumWindows(void (*)(HWND, LPARAM), LPARAM);
     ```
     chatglm4的解释如下：
-    >> 在 PHP FFI 中，您可以简化这个定义，直接使用 void (*)(HWND, LPARAM) 来表示一个接受 HWND 和 LPARAM 参数的回调函数指针。这是因为 PHP FFI 不需要您预先定义回调函数的型，它允许您直接使用函数定义作为参数类型。  
+    > 在 PHP FFI 中，您可以简化这个定义，直接使用 void (*)(HWND, LPARAM) 来表示一个接受 HWND 和 LPARAM 参数的回调函数指针。这是因为 PHP FFI 不需要您预先定义回调函数的型，它允许您直接使用函数定义作为参数类型。  
 
     千问的解释如下：
-    >> 在PHP FFI中，由于不能直接声明一个函数指针类型，因此通常使用void (*)(HWND, LPARAM)来表示这样一个接受特定参数类型的函数指针。这里的void表示回调函数没有返回值（在C中通常是BOOL或者WNDENUMPROC定义的返回类型），圆括号内的(HWND, LPARAM)则是指明回调函数需要接受的参数类型。
+    > 在PHP FFI中，由于不能直接声明一个函数指针类型，因此通常使用void (*)(HWND, LPARAM)来表示这样一个接受特定参数类型的函数指针。这里的void表示回调函数没有返回值（在C中通常是BOOL或者WNDENUMPROC定义的返回类型），圆括号内的(HWND, LPARAM)则是指明回调函数需要接受的参数类型。
