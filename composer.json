@@ -2,14 +2,20 @@
     "name": "he426100/php-windows",
     "type": "library",
     "autoload": {
+        "files": [
+            "src/php-windows-helper/src/Functions.php"
+        ],
         "psr-4": {
             "He426100\\phpautogui\\": "src/phpautogui/src",
-            "He426100\\phpmsgbox\\": "src/phpmsgbox/src"
+            "He426100\\phpmsgbox\\": "src/phpmsgbox/src",
+            "He426100\\phpgetwindow\\": "src/phpgetwindow/src"
         }
     },
     "replace": {
         "he426100/phpautogui": "*",
-        "he426100/phpmsgbox": "*"
+        "he426100/phpmsgbox": "*",
+        "he426100/phpgetwindow": "*",
+        "he426100/php-windows-helper": "*"
     },
     "authors": [
         {

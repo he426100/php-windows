@@ -3,6 +3,7 @@
 namespace He426100\phpautogui\platforms\windows;
 
 use FFI;
+use is_shift_character;
 use He426100\phpautogui\phpautogui;
 use He426100\phpautogui\platforms\platform;
 
@@ -340,7 +341,7 @@ final class windows implements platform
             return;
         }
 
-        $needsShift = phpautogui::isShiftCharacter($key);
+        $needsShift = is_shift_character($key);
         $divmod = fn ($x, $y) => [($x - ($x % $y)) / $y, $x % $y];
         [$mods, $vkCode] = $divmod($this->keyboardMapping[$key], 0x100);
 
@@ -380,7 +381,7 @@ final class windows implements platform
             return;
         }
 
-        $needsShift = phpautogui::isShiftCharacter($key);
+        $needsShift = is_shift_character($key);
         $divmod = fn ($x, $y) => [($x - ($x % $y)) / $y, $x % $y];
         [$mods, $vkCode] = $divmod($this->keyboardMapping[$key], 0x100);
 

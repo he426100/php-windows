@@ -731,16 +731,4 @@ class phpautogui
             throw new \Exception('PhpAutoGUI fail-safe triggered from mouse moving to a corner of the screen. To disable this fail-safe, set phpautogui.FAILSAFE to False. DISABLING FAIL-SAFE IS NOT RECOMMENDED.');
         }
     }
-
-    /**
-     * Returns True if the ``character`` is a keyboard key that would require the shift key to be held down, such as
-     * uppercase letters or the symbols on the keyboard's number row.
-     * @param string $char 
-     * @return bool 
-     */
-    public static function isShiftCharacter($char)
-    {
-        # NOTE TODO - This will be different for non-qwerty keyboards.
-        return ctype_upper($char) || in_array($char, str_split('~!@#$%^&*()_+{}|:"<>?'));
-    }
 }

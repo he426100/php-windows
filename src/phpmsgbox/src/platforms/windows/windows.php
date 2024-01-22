@@ -3,6 +3,7 @@
 namespace He426100\phpmsgbox\platforms\windows;
 
 use FFI;
+use string2wchar;
 use He426100\phpmsgbox\phpmsgbox;
 use He426100\phpmsgbox\platforms\platform;
 
@@ -67,7 +68,7 @@ final class windows implements platform
     public function alert($text, $title, $button = phpmsgbox::OK_TEXT, $icon = self::NO_ICON)
     {
         $text = (string)$text;
-        self::$ffi->MessageBoxA(0, $text, $title, self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
+        self::$ffi->MessageBoxW(0, string2wchar($text), string2wchar($title), self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
         return $button;
     }
 
@@ -108,10 +109,10 @@ final class windows implements platform
                 $buttonFlag = self::MB_YESNOCANCEL;
             }
         }
-        $retVal = self::$ffi->MessageBoxA(
+        $retVal = self::$ffi->MessageBoxW(
             0,
-            $text,
-            $title,
+            string2wchar($text),
+            string2wchar($title),
             $buttonFlag | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon
         );
         if ($retVal == self::IDOK || count($buttons) == 1) {

@@ -1,0 +1,18 @@
+{
+    "name": "he426100/php-windows-helper",
+    "type": "library",
+    "autoload": {
+        "files": [
+            "src/Functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "he426100"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-mbstring": "*"
+    }
+}
