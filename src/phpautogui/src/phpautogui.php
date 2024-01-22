@@ -422,27 +422,27 @@ class phpautogui
 
     public function leftClick($x = null, $y = null, $interval = 0.0, $duration = 0.0, $tween='linear', $pause = true)
     {
-        return $this->click($x, $y, 1, $interval, self::LEFT, $duration, pause: $pause);
+        $this->click($x, $y, 1, $interval, self::LEFT, $duration, pause: $pause);
     }
 
     public function rightClick($x = null, $y = null, $interval = 0.0, $duration = 0.0, $tween='linear', $pause = true)
     {
-        return $this->click($x, $y, 1, $interval, self::RIGHT, $duration, pause: $pause);
+        $this->click($x, $y, 1, $interval, self::RIGHT, $duration, pause: $pause);
     }
 
     public function middleclick($x = null, $y = null, $interval = 0.0, $duration = 0.0, $tween='linear', $pause = true)
     {
-        return $this->click($x, $y, 1, $interval, self::MIDDLE, $duration, pause: $pause);
+        $this->click($x, $y, 1, $interval, self::MIDDLE, $duration, pause: $pause);
     }
 
     public function doubleClick($x = null, $y = null, $interval = 0.0, $button = self::LEFT, $duration = 0.0, $tween='linear', $pause = true)
     {
-        return $this->click($x, $y, 2, $interval, $button, $duration, pause: $pause);
+        $this->click($x, $y, 2, $interval, $button, $duration, pause: $pause);
     }
 
     public function tripleClick($x = null, $y = null, $interval = 0.0, $button = self::LEFT, $duration = 0.0, $tween='linear', $pause = true)
     {
-        return $this->click($x, $y, 3, $interval, $button, $duration, pause: $pause);
+        $this->click($x, $y, 3, $interval, $button, $duration, pause: $pause);
     }
 
     public function scroll($clicks, $x = null, $y = null)
@@ -696,7 +696,7 @@ class phpautogui
 
     public function write($message, $interval = 0.0)
     {
-        return $this->typewrite($message, $interval);
+        $this->typewrite($message, $interval);
     }
 
     public function hotkey($keys, $interval = 0.0)

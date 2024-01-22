@@ -31,6 +31,6 @@
         }
     },
     "scripts": {
-        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=-1 src"
+        "analyse": "@php vendor/bin/phpstan analyse --memory-limit=-1 -l 0 src"
     }
 }
