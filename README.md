@@ -4,7 +4,7 @@
 基于[php ffi](https://www.php.net/manual/zh/book.ffi.php)，移植`pyautogui`、`pymsgbox`
 
 ### 示例
-- phpautogui notepad.exe
+- phpautogui notepad
 ```php
 <?php
 
@@ -25,6 +25,28 @@ usleep(2 * 1000_000);
 
 $auto->typewrite('PHP is the best language.', 0.1);
 ```
+
+- phpautogui mouse
+```php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use He426100\phpautogui\phpautogui;
+use He426100\phpautogui\platforms\windows\windows;
+
+$auto = new phpautogui(new windows);
+$size = $auto->size();
+$position = $auto->position();
+echo 'currentX: ' . $position[0], ', currentY: ' . $position[1], ', width: ' . $size[0], ', height: ' . $size[1], PHP_EOL;
+
+$s = microtime(true);
+$central = [$size[0] / 2, $size[1] / 2];
+$auto->moveTo($central[0], $central[1], 0.5);
+assert($auto->position() == $central);
+echo 'moved to (', $central[0], ', ', $central[1], '), used ' . (microtime(true) - $s) . ' s', PHP_EOL;
+```
+
 - phpmsgbox
 ```php
 <?php
