@@ -10,6 +10,5 @@ $native = new windows;
 $window = new phpgetwindow($native);
 echo "活动窗口标题: " . $window->getActiveWindowTitle() . "\n";
 echo "所有窗口标题:\n";
-print_r($window->getAllTitles());
-// echo "所有窗口句柄:\n";
-// $hWndsAndTitles = $native->listAllTitles();
+$hWndsAndTitles = $native->listAllTitles();
+print_r(array_column($hWndsAndTitles, 1, 0));

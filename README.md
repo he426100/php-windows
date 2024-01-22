@@ -93,7 +93,7 @@ print_r($window->getAllTitles());
 - [MessageBoxA](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-MessageBoxA)  
 - [MessageBoxW](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-MessageBoxW)  
 
-3. ffi中定义回调函数
+3. 回调函数
 - EnumWindows.WNDENUMPROC  
     原版定义，见 [nf-winuser-EnumWindows](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-EnumWindows)  
     ```c++

@@ -1,9 +1,9 @@
-typedef void *HWND;
 typedef unsigned short WCHAR;
 typedef WCHAR *LPWSTR;
 typedef unsigned long DWORD;
 typedef unsigned int UINT;
 typedef unsigned long WPARAM;
+typedef UINT HWND;
 typedef long LPARAM;
 typedef int BOOL;
 
