@@ -1,0 +1,15 @@
+{
+    "name": "he426100/phpautogui",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "He426100\\phpautogui\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "he426100"
+        }
+    ],
+    "require": {}
+}

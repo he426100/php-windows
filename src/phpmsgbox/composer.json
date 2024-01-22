@@ -1,0 +1,15 @@
+{
+    "name": "he426100/phpmsgbox",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "He426100\\phpmsgbox\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "he426100"
+        }
+    ],
+    "require": {}
+}
