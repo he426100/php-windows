@@ -28,9 +28,9 @@ final class windows implements platform
     public function getActiveWindow()
     {
         $hWnd = self::$ffi->GetForegroundWindow();
-        // if (FFI::cast('int*', $hWnd)[0] == 0) {
-        //     return null;
-        // }
+        if ($hWnd == 0) {
+            return null;
+        }
         return new Win32Window($hWnd);
     }
 
@@ -38,9 +38,9 @@ final class windows implements platform
     {
         $activeWindowTitle = '';
         $activeWindowHwnd = self::$ffi->GetForegroundWindow();
-        // if (FFI::cast('int*', $activeWindowHwnd)[0] == 0) {
-        //     return null;
-        // }
+        if ($activeWindowHwnd == 0) {
+            return null;
+        }
         self::$ffi->EnumWindows(function ($hWnd, $lParam) use ($activeWindowHwnd, &$activeWindowTitle) {
             if ($hWnd == $activeWindowHwnd) {
                 $length = self::$ffi->GetWindowTextLengthW($hWnd);
