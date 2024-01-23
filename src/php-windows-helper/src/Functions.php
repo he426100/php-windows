@@ -1,25 +1,48 @@
 <?php
 
 if (!function_exists('string2wchar')) {
-    function string2wchar($str)
+    /**
+     * php string转windows wchar
+     * 主要为MessageBoxW设计，无法使用php-ffi/scalar-utils的Type::wideString
+     */
+    function string2wchar($string)
     {
-        $messageUtf16 = mb_convert_encoding($str, 'UTF-16LE', 'UTF-8');
-        $messageLength = strlen($messageUtf16);
-        $messageBuffer = \FFI::new("uint16_t[" . ($messageLength + 1) . "]");
-        \FFI::memcpy($messageBuffer, $messageUtf16, $messageLength);
-        return $messageBuffer;
+        $stringUtf16 = mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
+        $length = \strlen($nullTerminated = $stringUtf16 . "\0\0");
+        $instance = \FFI::new("uint16_t[$length]");
+        \FFI::memcpy($instance, $nullTerminated, $length);
+        return $instance;
     }
 }
 
 if (!function_exists('wchar2string')) {
-    function wchar2string($wchar)
+    /**
+     * WCHAR 转 php string
+     * 复制自 php-ffi/scalar-utils
+     * @param CData $cdata 
+     * @param ?int $size 
+     * @return int|string 
+     */
+    function wchar2string($cdata, $size = null)
     {
-        $messageLength = 0;
-        while ($wchar[$messageLength]) {
-            $messageLength++;
+        [$i, $result] = [0, ''];
+        if ($size !== null) {
+            for ($i = 0; $i < $size; ++$i) {
+                $char = $cdata[$i];
+                $result .= \is_int($char) ? \mb_chr($char) : $char;
+            }
+
+            return $result;
         }
-        $messageUtf8 = \FFI::string($wchar, $messageLength * 2);
-        return mb_convert_encoding($messageUtf8, 'UTF-8', 'UTF-16LE');
+        do {
+            $char = $cdata[$i];
+            if ($char === 0 || $char === "\0") {
+                return $result;
+            }
+            $result .= \is_int($char) ? \mb_chr($char) : $char;
+        } while (++$i);
+
+        return $result;
     }
 }
 
