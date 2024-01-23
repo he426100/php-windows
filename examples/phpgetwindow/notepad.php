@@ -9,7 +9,7 @@ use He426100\phpgetwindow\platforms\windows\windows as phpgetwindow_windows;
 
 $auto = new phpautogui(new phpautogui_windows);
 $auto->press('win');
-usleep(0.2 * 1000_000);
+usleep(0.5 * 1000_000);
 
 $auto->typewrite('notepad.exe', 0.1);
 usleep(0.2 * 1000_000);
@@ -25,8 +25,16 @@ assert(count($noteWin) == 1);
 $resolution = $native->resolution();
 $noteWin[0]->resizeTo((int)($resolution[0] / 2), (int)($resolution[1] / 2));
 $noteWin[0]->activate();
+usleep(0.2 * 1000_000);
 
 // 移动窗口到屏幕中心
 $noteWin[0]->moveTo((int)($resolution[0] / 4), (int)($resolution[1] / 4));
+usleep(0.2 * 1000_000);
 
 $auto->typewrite('PHP is the best language.', 0.1);
+usleep(0.2 * 1000_000);
+
+[$left, $top, $right, $bottom] = $noteWin[0]->getWindowRect();
+$auto->click($left + 20, $top + 60);
+usleep(0.2 * 1000_000);
+$auto->hotkey(['ctrl', 's']);
