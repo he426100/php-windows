@@ -20,12 +20,15 @@ class Win32Window extends BaseWindow
 
     public static $ffi = null;
 
+    protected $kernel;
+
     public function __construct(protected $hWnd)
     {
         if (is_null(self::$ffi)) {
             // 不知道为啥用load不行
             self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
         }
+        $this->kernel = new kernel32();
     }
 
     public function getWindowRect()
@@ -35,12 +38,15 @@ class Win32Window extends BaseWindow
         if ($result != 0) {
             return [$rect->left, $rect->top, $rect->right, $rect->bottom];
         }
-        throw new \Exception('get window rect failed!');
+        $this->kernel->throwLastError();
     }
 
     public function close()
     {
-        self::$ffi->PostMessageA($this->hWnd, self::WM_CLOSE, 0, 0);
+        $result = self::$ffi->PostMessageA($this->hWnd, self::WM_CLOSE, 0, 0);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function minimize()
@@ -70,14 +76,20 @@ class Win32Window extends BaseWindow
 
     public function activate()
     {
-        self::$ffi->SetForegroundWindow($this->hWnd);
+        $result = self::$ffi->SetForegroundWindow($this->hWnd);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function resize($widthOffset, $heightOffset)
     {
         [$left, $top, $right, $bottom] = $this->getWindowRect();
         [$width, $height] = [$right - $left, $bottom - $top];
-        self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $width + $widthOffset, $height + $heightOffset, 0);
+        $result = self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $width + $widthOffset, $height + $heightOffset, 0);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function resizeRel($widthOffset, $heightOffset)
@@ -88,14 +100,20 @@ class Win32Window extends BaseWindow
     public function resizeTo($newWidth, $newHeight)
     {
         [$left, $top, $right, $bottom] = $this->getWindowRect();
-        self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $newWidth, $newHeight, 0);
+        $result = self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $newWidth, $newHeight, 0);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function move($xOffset, $yOffset)
     {
         [$left, $top, $right, $bottom] = $this->getWindowRect();
         [$width, $height] = [$right - $left, $bottom - $top];
-        self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left + $xOffset, $top + $yOffset, $width, $height, 0);
+        $result = self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left + $xOffset, $top + $yOffset, $width, $height, 0);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function moveRel($xOffset, $yOffset)
@@ -107,7 +125,10 @@ class Win32Window extends BaseWindow
     {
         [$left, $top, $right, $bottom] = $this->getWindowRect();
         [$width, $height] = [$right - $left, $bottom - $top];
-        self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $newLeft, $newTop, $width, $height, 0);
+        $result = self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $newLeft, $newTop, $width, $height, 0);
+        if ($result == 0) {
+            $this->kernel->throwLastError();
+        }
     }
 
     public function isMinimized()
