@@ -20,17 +20,12 @@ class Win32Window extends BaseWindow
 
     public static $ffi = null;
 
-    protected $rect;
-    protected $size;
-
     public function __construct(protected $hWnd)
     {
         if (is_null(self::$ffi)) {
             // 不知道为啥用load不行
             self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
         }
-        $this->rect = [$left, $top, $right, $bottom] = $this->getWindowRect();
-        $this->size = [$right - $left, $bottom - $top];
     }
 
     public function getWindowRect()
@@ -80,8 +75,8 @@ class Win32Window extends BaseWindow
 
     public function resize($widthOffset, $heightOffset)
     {
-        [$left, $top, $right, $bottom] = $this->rect;
-        [$width, $height] = $this->size;
+        [$left, $top, $right, $bottom] = $this->getWindowRect();
+        [$width, $height] = [$right - $left, $bottom - $top];
         self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $width + $widthOffset, $height + $heightOffset, 0);
     }
 
@@ -92,14 +87,14 @@ class Win32Window extends BaseWindow
 
     public function resizeTo($newWidth, $newHeight)
     {
-        [$left, $top, $right, $bottom] = $this->rect;
+        [$left, $top, $right, $bottom] = $this->getWindowRect();
         self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left, $top, $newWidth, $newHeight, 0);
     }
 
     public function move($xOffset, $yOffset)
     {
-        [$left, $top, $right, $bottom] = $this->rect;
-        [$width, $height] = $this->size;
+        [$left, $top, $right, $bottom] = $this->getWindowRect();
+        [$width, $height] = [$right - $left, $bottom - $top];
         self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $left + $xOffset, $top + $yOffset, $width, $height, 0);
     }
 
@@ -110,7 +105,8 @@ class Win32Window extends BaseWindow
 
     public function moveTo($newLeft, $newTop)
     {
-        [$width, $height] = $this->size;
+        [$left, $top, $right, $bottom] = $this->getWindowRect();
+        [$width, $height] = [$right - $left, $bottom - $top];
         self::$ffi->SetWindowPos($this->hWnd, self::HWND_TOP, $newLeft, $newTop, $width, $height, 0);
     }
 
@@ -145,15 +141,5 @@ class Win32Window extends BaseWindow
     public function isVisible()
     {
         return self::$ffi->IsWindowVisible($this->hWnd);
-    }
-
-    public function getRect()
-    {
-        return $this->rect;
-    }
-
-    public function getSize()
-    {
-        return $this->size;
     }
 }

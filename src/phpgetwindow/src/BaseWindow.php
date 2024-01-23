@@ -18,8 +18,6 @@ abstract class BaseWindow
     abstract public function moveTo($newLeft, $newTop);
     abstract public function getTitle();
     abstract public function isVisible();
-    abstract public function getRect();
-    abstract public function getSize();
 
     public function __toString()
     {
@@ -32,7 +30,7 @@ abstract class BaseWindow
             $top,
             $width,
             $height,
-            $this->title,
+            $this->getTitle(),
         );
     }
 }   

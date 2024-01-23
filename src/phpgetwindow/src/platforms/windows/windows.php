@@ -57,8 +57,8 @@ final class windows implements platform
     {
         $windowsAtXY = [];
         foreach ($this->getAllWindows() as $window) {
-            [$left, $top] = $window->getRect();
-            [$width, $height] = $window->getSize();
+            [$left, $top, $right, $bottom] = $window->getWindowRect();
+            [$width, $height] = [$right - $left, $bottom - $top];
             if (point_in_rect($x, $y, $left, $top, $width, $height)) {
                 $windowsAtXY[] = $window;
             }
