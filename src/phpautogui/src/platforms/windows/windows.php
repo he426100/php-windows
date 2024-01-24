@@ -415,6 +415,11 @@ final class windows implements platform
         return isset($this->keyboardMapping[$key]);
     }
 
+    public function getKeyName($key)
+    {
+        return array_search($key, $this->keyboardMapping) ?: $key;
+    }
+
     public function position()
     {
         $point = self::$ffi->new("POINT");

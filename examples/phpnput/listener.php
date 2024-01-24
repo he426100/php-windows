@@ -6,7 +6,12 @@
  * 神奇，静态php带swow扩展不需要下面这行require
  * 这个脚本还没写完，原版pynput用了thread，不知道怎么模拟
  */
+
 require __DIR__ . '/../../vendor/autoload.php';
+
+use He426100\phpautogui\platforms\windows\windows;
+
+$windows = new windows;
 
 $ffi = FFI::cdef("
     typedef long LONG_PTR;
@@ -146,19 +151,19 @@ $mouseHook = $ffi->SetWindowsHookExW(WH_MOUSE_LL, function ($nCode, $wParam, $lP
     return $ffi->CallNextHookEx(null, $nCode, $wParam, $lParam);
 }, null, 0);
 
-$keyboardHook = $ffi->SetWindowsHookExW(WH_KEYBOARD_LL, function ($nCode, $wParam, $lParam) use (&$keyboardHook, &$mouseHook, &$listen) {
+$keyboardHook = $ffi->SetWindowsHookExW(WH_KEYBOARD_LL, function ($nCode, $wParam, $lParam) use (&$keyboardHook, &$mouseHook, &$listen, $windows) {
     global $ffi;
 
     if ($nCode == 0 && $wParam == WM_KEYDOWN) {
         $kbdStruct = $ffi->cast('PKBDLLHOOKSTRUCT', $lParam);
         $keyCode = $kbdStruct->vkCode;
 
-        if ($keyCode == 27) { // Esc键
+        if ($keyCode == windows::VK_ESCAPE) { // Esc键
             $listen = false;
             $ffi->UnhookWindowsHookEx($mouseHook);
             $ffi->UnhookWindowsHookEx($keyboardHook);
         } else {
-            echo 'pressed: ', $keyCode, PHP_EOL;
+            echo 'pressed: ', $windows->getKeyName($keyCode), PHP_EOL;
         }
     }
 
