@@ -299,7 +299,7 @@ final class windows implements platform
         'launchapp2' => 0xb7, # VK_LAUNCH_APP2
     ];
 
-    public static $ffi = null;
+    private ?FFI $ffi = null;
 
     public function __construct()
     {
@@ -312,15 +312,11 @@ final class windows implements platform
 
         # Populate the basic printable ascii characters.
         # https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-vkkeyscana
-
-        if (is_null(self::$ffi)) {
-            // 不知道为啥用load不行
-            self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
-        }
+        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
 
         for ($c = 32; $c < 128; $c++) {
             $chr = chr($c);
-            $vkCode = self::$ffi->VkKeyScanA($chr);
+            $vkCode = $this->ffi->VkKeyScanA($chr);
             if ($vkCode != -1) { // VkKeyScanA返回-1表示无法找到映射
                 $this->keyboardMapping[$chr] = $vkCode;
             }
@@ -353,10 +349,10 @@ final class windows implements platform
         ];
         foreach ($vk_mods as [$apply_mod, $vk_mod]) {
             if ($apply_mod) {
-                self::$ffi->keybd_event($vk_mod, 0, self::KEYEVENTF_KEYDOWN, 0);
+                $this->ffi->keybd_event($vk_mod, 0, self::KEYEVENTF_KEYDOWN, 0);
             }
         }
-        self::$ffi->keybd_event($vkCode, 0, self::KEYEVENTF_KEYDOWN, 0);
+        $this->ffi->keybd_event($vkCode, 0, self::KEYEVENTF_KEYDOWN, 0);
 
         $vk_mods = [
             [$mods & 1 || $needsShift, 0x10],
@@ -365,7 +361,7 @@ final class windows implements platform
         ];
         foreach ($vk_mods as [$apply_mod, $vk_modifier]) {
             if ($apply_mod) {
-                self::$ffi->keybd_event($vk_modifier, 0, self::KEYEVENTF_KEYUP, 0);
+                $this->ffi->keybd_event($vk_modifier, 0, self::KEYEVENTF_KEYUP, 0);
             }
         }
     }
@@ -393,10 +389,10 @@ final class windows implements platform
         ];
         foreach ($vk_mods as [$apply_mod, $vk_mod]) {
             if ($apply_mod) {
-                self::$ffi->keybd_event($vk_mod, 0, self::KEYEVENTF_KEYDOWN, 0);
+                $this->ffi->keybd_event($vk_mod, 0, self::KEYEVENTF_KEYDOWN, 0);
             }
         }
-        self::$ffi->keybd_event($vkCode, 0, self::KEYEVENTF_KEYUP, 0);
+        $this->ffi->keybd_event($vkCode, 0, self::KEYEVENTF_KEYUP, 0);
 
         $vk_mods = [
             [$mods & 1 || $needsShift, 0x10],
@@ -405,7 +401,7 @@ final class windows implements platform
         ];
         foreach ($vk_mods as [$apply_mod, $vk_modifier]) {
             if ($apply_mod) {
-                self::$ffi->keybd_event($vk_modifier, 0, self::KEYEVENTF_KEYUP, 0);
+                $this->ffi->keybd_event($vk_modifier, 0, self::KEYEVENTF_KEYUP, 0);
             }
         }
     }
@@ -422,8 +418,8 @@ final class windows implements platform
 
     public function position()
     {
-        $point = self::$ffi->new("POINT");
-        self::$ffi->GetCursorPos(FFI::addr($point));
+        $point = $this->ffi->new("POINT");
+        $this->ffi->GetCursorPos(FFI::addr($point));
 
         return [$point->x, $point->y];
     }
@@ -431,15 +427,15 @@ final class windows implements platform
     public function size()
     {
         return [
-            self::$ffi->GetSystemMetrics(0),
-            self::$ffi->GetSystemMetrics(1)
+            $this->ffi->GetSystemMetrics(0),
+            $this->ffi->GetSystemMetrics(1)
         ];
     }
 
     public function moveTo($x, $y)
     {
         // 设置鼠标位置
-        self::$ffi->SetCursorPos($x, $y);
+        $this->ffi->SetCursorPos($x, $y);
     }
 
     /**
@@ -505,7 +501,7 @@ final class windows implements platform
     public function mouseIsSwapped()
     {
         # 23 is SM_SWAPBUTTON: "Nonzero if the meanings of the left and right mouse buttons are swapped; otherwise, 0."
-        return self::$ffi->GetSystemMetrics(23) != 0;
+        return $this->ffi->GetSystemMetrics(23) != 0;
     }
 
     /**
@@ -523,7 +519,7 @@ final class windows implements platform
         [$width, $height] = $this->size();
         $convertedX = 65536 * $x; // width + 1
         $convertedY = 65536 * $y; // height + 1
-        self::$ffi->mouse_event($ev, $convertedX, $convertedY, $dwData, 0);
+        $this->ffi->mouse_event($ev, $convertedX, $convertedY, $dwData, 0);
     }
 
     /**

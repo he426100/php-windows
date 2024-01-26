@@ -15,19 +15,16 @@ final class windows implements platform
     public const FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
     public const FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
 
-    public static $ffi = null;
+    private ?FFI $ffi = null;
 
     public function __construct()
     {
-        if (is_null(self::$ffi)) {
-            // 不知道为啥用load不行
-            self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
-        }
+        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
     }
 
     public function getActiveWindow()
     {
-        $hWnd = self::$ffi->GetForegroundWindow();
+        $hWnd = $this->ffi->GetForegroundWindow();
         if ($hWnd == 0) {
             return null;
         }
@@ -37,15 +34,15 @@ final class windows implements platform
     public function getActiveWindowTitle()
     {
         $activeWindowTitle = '';
-        $activeWindowHwnd = self::$ffi->GetForegroundWindow();
+        $activeWindowHwnd = $this->ffi->GetForegroundWindow();
         if ($activeWindowHwnd == 0) {
             return null;
         }
-        self::$ffi->EnumWindows(function ($hWnd, $lParam) use ($activeWindowHwnd, &$activeWindowTitle) {
+        $this->ffi->EnumWindows(function ($hWnd, $lParam) use ($activeWindowHwnd, &$activeWindowTitle) {
             if ($hWnd == $activeWindowHwnd) {
-                $length = self::$ffi->GetWindowTextLengthW($hWnd);
+                $length = $this->ffi->GetWindowTextLengthW($hWnd);
                 $buffer = FFI::new("unsigned short[" . ($length + 1) . "]", false);
-                self::$ffi->GetWindowTextW($hWnd, $buffer, $length + 1);
+                $this->ffi->GetWindowTextW($hWnd, $buffer, $length + 1);
                 $activeWindowTitle = wchar2string($buffer);
             }
             return true;
@@ -86,8 +83,8 @@ final class windows implements platform
     public function getAllWindows()
     {
         $windowObjs = [];
-        self::$ffi->EnumWindows(function ($hWnd, $lParam) use (&$windowObjs) {
-            if (self::$ffi->IsWindowVisible($hWnd)) {
+        $this->ffi->EnumWindows(function ($hWnd, $lParam) use (&$windowObjs) {
+            if ($this->ffi->IsWindowVisible($hWnd)) {
                 $windowObjs[] = new Win32Window($hWnd);
             }
             return true;
@@ -99,11 +96,11 @@ final class windows implements platform
     public function listAllTitles()
     {
         $titles = [];
-        self::$ffi->EnumWindows(function ($hWnd, $lParam) use (&$titles) {
-            if (self::$ffi->IsWindowVisible($hWnd)) {
-                $length = self::$ffi->GetWindowTextLengthW($hWnd);
+        $this->ffi->EnumWindows(function ($hWnd, $lParam) use (&$titles) {
+            if ($this->ffi->IsWindowVisible($hWnd)) {
+                $length = $this->ffi->GetWindowTextLengthW($hWnd);
                 $titleBuffer = FFI::new("unsigned short[" . ($length + 1) . "]", false);
-                self::$ffi->GetWindowTextW($hWnd, $titleBuffer, $length + 1);
+                $this->ffi->GetWindowTextW($hWnd, $titleBuffer, $length + 1);
                 $titles[] = [$hWnd, wchar2string($titleBuffer)];
             }
             return true;
@@ -114,8 +111,8 @@ final class windows implements platform
 
     public function cursor()
     {
-        $point = self::$ffi->new("POINT");
-        self::$ffi->GetCursorPos(FFI::addr($point));
+        $point = $this->ffi->new("POINT");
+        $this->ffi->GetCursorPos(FFI::addr($point));
 
         return [$point->x, $point->y];
     }
@@ -123,8 +120,8 @@ final class windows implements platform
     public function resolution()
     {
         return [
-            self::$ffi->GetSystemMetrics(0),
-            self::$ffi->GetSystemMetrics(1)
+            $this->ffi->GetSystemMetrics(0),
+            $this->ffi->GetSystemMetrics(1)
         ];
     }
 }

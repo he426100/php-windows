@@ -18,40 +18,38 @@ final class kernel32
     public const FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
     public const FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
 
-    public static $ffi = null;
+    private ?FFI $ffi = null;
 
     public function __construct()
     {
-        if (is_null(self::$ffi)) {
-            self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/kernel32.h'), 'kernel32.dll');
-        }
+        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/kernel32.h'), 'kernel32.dll');
     }
 
     public function getAllProcess()
     {
         $processObjs = [];
         // 获取系统中的进程快照
-        $hProcessSnap = self::$ffi->CreateToolhelp32Snapshot(0x00000002, 0);
+        $hProcessSnap = $this->ffi->CreateToolhelp32Snapshot(0x00000002, 0);
         if ($hProcessSnap == null) {
             throw new \Exception("CreateToolhelp32Snapshot failed");
         }
 
         // 设置 PROCESSENTRY32 结构的大小
-        $pe32 = self::$ffi->new("PROCESSENTRY32");
-        $pe32->dwSize = self::$ffi::sizeof($pe32);
+        $pe32 = $this->ffi->new("PROCESSENTRY32");
+        $pe32->dwSize = $this->ffi::sizeof($pe32);
 
         // 遍历进程快照，获取进程信息
-        if (!self::$ffi->Process32First($hProcessSnap, FFI::addr($pe32))) {
+        if (!$this->ffi->Process32First($hProcessSnap, FFI::addr($pe32))) {
             throw new \Exception("Process32First failed");
         }
 
         // 显示每个进程的信息
         do {
             $processObjs[] = new Process32(clone $pe32);
-        } while (self::$ffi->Process32Next($hProcessSnap, FFI::addr($pe32)));
+        } while ($this->ffi->Process32Next($hProcessSnap, FFI::addr($pe32)));
 
         // 关闭进程快照句柄
-        self::$ffi->CloseHandle($hProcessSnap);
+        $this->ffi->CloseHandle($hProcessSnap);
 
         return $processObjs;
     }
@@ -65,7 +63,7 @@ final class kernel32
 
     public function getLastError()
     {
-        return self::$ffi->GetLastError();
+        return $this->ffi->GetLastError();
     }
 
     public function throwLastError()
@@ -81,18 +79,18 @@ final class kernel32
      */
     public function formatMessage($errorCode)
     {
-        $lpBuffer = self::$ffi->new("LPWSTR");
-        self::$ffi->FormatMessageW(
+        $lpBuffer = $this->ffi->new("LPWSTR");
+        $this->ffi->FormatMessageW(
             self::FORMAT_MESSAGE_FROM_SYSTEM | self::FORMAT_MESSAGE_ALLOCATE_BUFFER | self::FORMAT_MESSAGE_IGNORE_INSERTS,
             null,
             $errorCode,
             0, // dwLanguageId
-            self::$ffi->cast('LPWSTR', FFI::addr($lpBuffer)),
+            $this->ffi->cast('LPWSTR', FFI::addr($lpBuffer)),
             0, // nSize
             null
         );
         $msg = rtrim(wchar2string($lpBuffer));
-        self::$ffi->LocalFree($lpBuffer);
+        $this->ffi->LocalFree($lpBuffer);
         return $msg;
     }
 }

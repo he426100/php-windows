@@ -47,14 +47,12 @@ final class windows implements platform
     public const IDRETRY = 0x4;
     public const IDTRYAGAIN = 0x10;
     public const IDYES = 0x6;
-    public static $ffi = null;
+    
+    private ?FFI $ffi = null;
 
     public function __construct()
     {
-        if (is_null(self::$ffi)) {
-            // 不知道为啥用load不行
-            self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
-        }
+        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
     }
 
     /**
@@ -68,7 +66,7 @@ final class windows implements platform
     public function alert($text, $title, $button = phpmsgbox::OK_TEXT, $icon = self::NO_ICON)
     {
         $text = (string)$text;
-        self::$ffi->MessageBoxW(0, string2wchar($text), string2wchar($title), self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
+        $this->ffi->MessageBoxW(0, string2wchar($text), string2wchar($title), self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
         return $button;
     }
 
@@ -109,7 +107,7 @@ final class windows implements platform
                 $buttonFlag = self::MB_YESNOCANCEL;
             }
         }
-        $retVal = self::$ffi->MessageBoxW(
+        $retVal = $this->ffi->MessageBoxW(
             0,
             string2wchar($text),
             string2wchar($title),

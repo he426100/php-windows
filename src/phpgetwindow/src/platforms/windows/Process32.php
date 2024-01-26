@@ -7,14 +7,11 @@ use wchar2string;
 
 class Process32
 {
-    public static $ffi = null;
+    private ?FFI $ffi = null;
 
     public function __construct(protected $pe32)
     {
-        if (is_null(self::$ffi)) {
-            // 不知道为啥用load不行
-            self::$ffi = FFI::cdef(file_get_contents(__DIR__ . '/kernel32.h'), 'kernel32.dll');
-        }
+        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/kernel32.h'), 'kernel32.dll');
     }
 
     public function getTitle()
