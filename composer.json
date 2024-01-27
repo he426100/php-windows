@@ -27,6 +27,9 @@
         "phpstan/phpstan": "^1.9",
         "psy/psysh": "^0.12.0"
     },
+    "suggest": {
+        "skoro/tkui": "Required to use Tk."
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
