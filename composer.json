@@ -8,7 +8,8 @@
         "psr-4": {
             "He426100\\phpautogui\\": "src/phpautogui/src",
             "He426100\\phpmsgbox\\": "src/phpmsgbox/src",
-            "He426100\\phpgetwindow\\": "src/phpgetwindow/src"
+            "He426100\\phpgetwindow\\": "src/phpgetwindow/src",
+            "Local\\Driver\\Win32\\": "src/driver-win32/src"
         }
     },
     "replace": {
@@ -22,6 +23,10 @@
             "name": "he426100"
         }
     ],
+    "require": {
+        "ext-ffi": "*",
+        "ffi/proxy": "^1.0"
+    },
     "require-dev": {
         "pestphp/pest": "^2.28",
         "phpstan/phpstan": "^1.9",

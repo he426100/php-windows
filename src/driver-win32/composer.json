@@ -1,0 +1,16 @@
+{
+    "name": "local/driver-win32",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "ext-ffi": "*",
+        "ffi/proxy": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Local\\Driver\\Win32\\": "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

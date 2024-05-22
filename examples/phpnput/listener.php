@@ -9,98 +9,12 @@
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+use Local\Driver\Win32\Lib\User32;
 use He426100\phpautogui\platforms\windows\windows;
 
 $windows = new windows;
 
-$ffi = FFI::cdef("
-    typedef long LONG_PTR;
-    typedef int INT;
-    typedef unsigned int UINT;
-    typedef unsigned int DWORD;
-    typedef unsigned long ULONG_PTR;
-    typedef void* HANDLE;
-    typedef LONG_PTR LRESULT;
-    typedef HANDLE HHOOK;
-    typedef HANDLE HINSTANCE;
-    typedef unsigned long WPARAM;
-    typedef void* LPARAM;
-    typedef int BOOL;
-    typedef void* HWND;
-    typedef void* HOOKPROC;
-    
-    typedef struct tagPOINT
-    {
-        long x;
-        long y;
-    } POINT, *PPOINT;
-
-    typedef struct tagMSG {
-        HWND   hwnd;
-        UINT   message;
-        WPARAM wParam;
-        LPARAM lParam;
-        DWORD  time;
-        POINT  pt;
-        DWORD  lPrivate;
-    } MSG, *PMSG, *NPMSG, *LPMSG;
-
-    typedef struct tagMOUSEHOOKSTRUCT {
-        POINT     pt;
-        HWND      hwnd;
-        UINT      wHitTestCode;
-        ULONG_PTR dwExtraInfo;
-    } MOUSEHOOKSTRUCT, *LPMOUSEHOOKSTRUCT, *PMOUSEHOOKSTRUCT;
-
-    typedef struct tagMSLLHOOKSTRUCT {
-        POINT     pt;
-        DWORD     mouseData;
-        DWORD     flags;
-        DWORD     time;
-        ULONG_PTR dwExtraInfo;
-    } MSLLHOOKSTRUCT, *LPMSLLHOOKSTRUCT, *PMSLLHOOKSTRUCT;
-
-    typedef struct tagKBDLLHOOKSTRUCT {
-        DWORD     vkCode;
-        DWORD     scanCode;
-        DWORD     flags;
-        DWORD     time;
-        ULONG_PTR dwExtraInfo;
-    } KBDLLHOOKSTRUCT, *LPKBDLLHOOKSTRUCT, *PKBDLLHOOKSTRUCT;
-    
-    HHOOK SetWindowsHookExW(
-        int       idHook,
-        void (*)(int, WPARAM, LPARAM),
-        HINSTANCE hmod,
-        DWORD     dwThreadId
-    );
-    
-    LRESULT CallNextHookEx(
-        HHOOK  hhk,
-        int    nCode,
-        WPARAM wParam,
-        LPARAM lParam
-    );
-    
-    BOOL UnhookWindowsHookEx(
-        HANDLE hhk
-    );
-    
-    BOOL GetMessageW(
-        LPMSG lpMsg,
-        HWND  hWnd,
-        UINT  wMsgFilterMin,
-        UINT  wMsgFilterMax
-    );
-    
-    BOOL PeekMessageW(
-        LPMSG lpMsg,
-        HWND  hWnd,
-        UINT  wMsgFilterMin,
-        UINT  wMsgFilterMax,
-        UINT  wRemoveMsg
-    );
-", "user32.dll");
+$ffi = new User32();
 
 // 定义全局变量来存储钩子句柄
 $mouseHook = null;
