@@ -8,9 +8,51 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use He426100\phpautogui\platforms\windows\windows;
 
+class FFIProxy
+{
+    public function __construct(public \FFI $ffi)
+    {
+    }
+
+    public function __call(string $method, array $args)
+    {
+        assert($method !== '', 'Method name MUST not be empty');
+
+        return $this->ffi->$method(...$args);
+    }
+
+    public function __get(string $name)
+    {
+        assert($name !== '', 'Property name MUST not be empty');
+
+        return $this->ffi->$name;
+    }
+
+    public function __set(string $name, $value): void
+    {
+        assert($name !== '', 'Property name MUST not be empty');
+
+        $this->ffi->$name = $value;
+    }
+
+    public function __isset(string $name): bool
+    {
+        assert($name !== '', 'Property name MUST not be empty');
+
+        return isset($this->ffi->$name);
+    }
+
+    public function __unset(string $name): void
+    {
+        assert($name !== '', 'Property name MUST not be empty');
+
+        unset($this->ffi->$name);
+    }
+}
+
 $windows = new windows;
 
-$ffi = FFI::cdef("
+$ffi = new FFIProxy(FFI::cdef("
     // wtypesbase.h
     typedef void                *PVOID;
     typedef void                *LPVOID;
@@ -168,9 +210,9 @@ $ffi = FFI::cdef("
 
     LRESULT DispatchMessageA(const MSG *lpMsg);
     LRESULT DispatchMessageW(const MSG *lpMsg);
-", "user32.dll");
+", "user32.dll"));
 
-$ole32 = FFI::cdef("
+$ole32 = new FFIProxy(FFI::cdef("
     typedef void *LPVOID;
     typedef unsigned long DWORD;
     typedef long LONG;
@@ -178,7 +220,7 @@ $ole32 = FFI::cdef("
 
     HRESULT CoInitializeEx(LPVOID pvReserved, DWORD dwCoInit);
     void CoUninitialize(void);
-", "Ole32.dll");
+", "Ole32.dll"));
 
 // 定义全局变量来存储钩子句柄
 $mouseHook = null;
