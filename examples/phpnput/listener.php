@@ -1,9 +1,6 @@
 <?php
 /**
  * 先按 ESC，再按 CTRL+C 可退出脚本
- * 神奇，必须要下面这行require，否则移动鼠标时坐标会变但鼠标是不动的
- * 神奇，开启swow扩展的php.exe执行这个脚本，鼠标移动时坐标会变但鼠标是不动的
- * 神奇，静态php带swow扩展不需要下面这行require
  * 这个脚本还没写完，原版pynput用了thread，不知道怎么模拟
  */
 
@@ -14,35 +11,114 @@ use He426100\phpautogui\platforms\windows\windows;
 $windows = new windows;
 
 $ffi = FFI::cdef("
-    typedef long LONG_PTR;
-    typedef int INT;
-    typedef unsigned int UINT;
-    typedef unsigned int DWORD;
-    typedef unsigned long ULONG_PTR;
-    typedef void* HANDLE;
-    typedef LONG_PTR LRESULT;
-    typedef HANDLE HHOOK;
-    typedef HANDLE HINSTANCE;
-    typedef unsigned long WPARAM;
-    typedef void* LPARAM;
-    typedef int BOOL;
-    typedef void* HWND;
-    typedef void* HOOKPROC;
+    // wtypesbase.h
+    typedef void                *PVOID;
+    typedef void                *LPVOID;
+    typedef float               FLOAT;
+
+    // intsafe.h
+
+    typedef int64_t             INT_PTR;
+    typedef uint64_t            UINT_PTR;
+    typedef int64_t             LONG_PTR;
+    typedef uint64_t            ULONG_PTR;
+
+    typedef long                BOOL;
+    typedef char                CHAR;
+    typedef signed char         INT8;
+    typedef unsigned char       UCHAR;
+    typedef unsigned char       UINT8;
+    typedef unsigned char       BYTE;
+    typedef short               SHORT;
+    typedef signed short        INT16;
+    typedef unsigned short      USHORT;
+    typedef unsigned short      UINT16;
+    typedef unsigned short      WORD;
+    typedef int                 INT;
+    typedef signed int          INT32;
+    typedef unsigned int        UINT;
+    typedef unsigned int        UINT32;
+    typedef long                LONG;
+    typedef unsigned long       ULONG;
+    typedef unsigned long       DWORD;
+    typedef int64_t             LONGLONG;
+    typedef int64_t             LONG64;
+    typedef int64_t             INT64;
+    typedef uint64_t            ULONGLONG;
+    typedef uint64_t            DWORDLONG;
+    typedef uint64_t            ULONG64;
+    typedef uint64_t            DWORD64;
+    typedef uint64_t            UINT64;
+
+    typedef UINT                *PUINT;
+
+    // wtypes.h
+
+    typedef char                CHAR;
+    typedef CHAR                *LPSTR;
+    typedef const CHAR          *LPCSTR;
+
+    typedef unsigned short      WCHAR;
+    typedef WCHAR               TCHAR;
+
+    typedef WCHAR               *LPWSTR;
+    typedef TCHAR               *LPTSTR;
+    typedef const WCHAR         *LPCWSTR;
+    typedef const TCHAR         *LPCTSTR;
+
+    typedef UINT_PTR            WPARAM;
+    typedef LONG_PTR            LPARAM;
+    typedef LONG_PTR            LRESULT;
+
+    typedef void*               HANDLE;
+
+    typedef intptr_t            HWND;
+
+    typedef UINT_PTR            HMENU;
+    typedef HANDLE              HACCEL;
+    typedef HANDLE              HBRUSH;
+    typedef HANDLE              HFONT;
+    typedef HANDLE              HDC;
+    typedef HANDLE              HICON;
+    typedef HANDLE              HRGN;
+    typedef HANDLE              HMONITOR;
+    typedef HANDLE              HMODULE;
+    typedef HANDLE              HINSTANCE;
+    typedef HANDLE              HTASK;
+    typedef HANDLE              HKEY;
+    typedef HANDLE              HDESK;
+    typedef HANDLE              HMF;
+    typedef HANDLE              HEMF;
+    typedef HANDLE              HPEN;
+    typedef HANDLE              HRSRC;
+    typedef HANDLE              HSTR;
+    typedef HANDLE              HWINSTA;
+    typedef HANDLE              HKL;
+    typedef HANDLE              HGDIOBJ;
+    typedef HANDLE              HDWP;
+    typedef HICON               HCURSOR;
+
+    typedef LONG                HRESULT;
+
+    // dimm.h
+
+    typedef WORD ATOM;
     
-    typedef struct tagPOINT
-    {
-        long x;
-        long y;
-    } POINT, *PPOINT;
+    // https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
+    typedef HANDLE HHOOK;
+
+    typedef struct tagPOINT {
+        LONG x;
+        LONG y;
+    } POINT, *PPOINT, *NPPOINT, *LPPOINT;
 
     typedef struct tagMSG {
-        HWND   hwnd;
-        UINT   message;
+        HWND hwnd;
+        UINT message;
         WPARAM wParam;
         LPARAM lParam;
-        DWORD  time;
-        POINT  pt;
-        DWORD  lPrivate;
+        DWORD time;
+        POINT pt;
     } MSG, *PMSG, *NPMSG, *LPMSG;
 
     typedef struct tagMOUSEHOOKSTRUCT {
@@ -86,21 +162,23 @@ $ffi = FFI::cdef("
         HANDLE hhk
     );
     
-    BOOL GetMessageW(
-        LPMSG lpMsg,
-        HWND  hWnd,
-        UINT  wMsgFilterMin,
-        UINT  wMsgFilterMax
-    );
+    BOOL GetMessageW(LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax);
     
-    BOOL PeekMessageW(
-        LPMSG lpMsg,
-        HWND  hWnd,
-        UINT  wMsgFilterMin,
-        UINT  wMsgFilterMax,
-        UINT  wRemoveMsg
-    );
+    BOOL TranslateMessage(const MSG *lpMsg);
+
+    LRESULT DispatchMessageA(const MSG *lpMsg);
+    LRESULT DispatchMessageW(const MSG *lpMsg);
 ", "user32.dll");
+
+$ole32 = FFI::cdef("
+    typedef void *LPVOID;
+    typedef unsigned long DWORD;
+    typedef long LONG;
+    typedef LONG HRESULT;
+
+    HRESULT CoInitializeEx(LPVOID pvReserved, DWORD dwCoInit);
+    void CoUninitialize(void);
+", "Ole32.dll");
 
 // 定义全局变量来存储钩子句柄
 $mouseHook = null;
@@ -129,6 +207,10 @@ const MK_XBUTTON2 = 0x0040;
 
 const XBUTTON1 = 1;
 const XBUTTON2 = 2;
+
+const COINIT_APARTMENTTHREADED = 0x02;
+
+$ole32->CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 
 // 安装鼠标钩子
 $mouseHook = $ffi->SetWindowsHookExW(WH_MOUSE_LL, function ($nCode, $wParam, $lParam) {
@@ -170,15 +252,15 @@ $keyboardHook = $ffi->SetWindowsHookExW(WH_KEYBOARD_LL, function ($nCode, $wPara
     return $ffi->CallNextHookEx(null, $nCode, $wParam, $lParam);
 }, null, 0);
 
+$msg = FFI::addr($ffi->new("MSG"));
 while ($listen) {
-    $msg = $ffi->new("MSG");
-    while ($ffi->GetMessageW(FFI::addr($msg), null, 0, 0) !== 0) {
-        echo '我执行了1, ', $listen, PHP_EOL;
-        $ffi->PeekMessageW($msg);
-        echo '我执行了2, ', $listen, PHP_EOL;
+    if ($ffi->GetMessageW($msg, null, 0, 0)) {
+        $ffi->TranslateMessage($msg);
+        $ffi->DispatchMessageW($msg);
     }
-    echo '我执行了3, ', $listen, PHP_EOL;
+    \usleep(1);
 }
 
 $ffi->UnhookWindowsHookEx($mouseHook);
 $ffi->UnhookWindowsHookEx($keyboardHook);
+$ole32->CoUninitialize();
