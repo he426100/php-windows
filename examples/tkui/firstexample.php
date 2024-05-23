@@ -14,7 +14,7 @@ use Tkui\Widgets\Buttons\Button;
 use Tkui\Windows\MainWindow;
 use Tkui\TclTk\Variable;
 
-function calculate(...$args) {
+function my_calculate(...$args) {
     global $feet, $meters;
     
     try {
@@ -55,7 +55,7 @@ $mainframe->grid(new Label($mainframe, '', ['textVariable' => $meters]), [
 ]);
 
 $mainframe->grid(new Button($mainframe, 'Calculate', [
-    'command' => 'calculate'
+    'command' => 'my_calculate'
 ]), [
     ...$gridOptions,
     'column' => 3,
@@ -85,6 +85,6 @@ $mainframe->grid(new Label($mainframe, 'meters'), [
 ]);
 
 $feet_entry->focus();
-$root->bind('Return', 'calculate');
+$root->bind('Return', 'my_calculate');
 
 $app->run();

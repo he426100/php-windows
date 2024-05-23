@@ -3,6 +3,7 @@
 require __DIR__ . '/../../vendor/autoload.php';
 
 use Tkui\DotEnv;
+use Tkui\WMState;
 use Tkui\TclTk\TkAppFactory;
 use Tkui\Windows\MainWindow;
 use Tkui\Dialogs\MessageBox;
@@ -22,7 +23,7 @@ $factory = new TkAppFactory('tkui');
 $app = $factory->createFromEnvironment($env);
 $window = new MainWindow($app, 'tkui');
 // 最小化，显示在任务栏
-$window->state = TkWindowManager::STATE_ICONIC;
+$window->state = WMState::ICONIC;
 
 (new MessageBox($window, '温馨提示', 'php是最好的语言。', [
     'type' => MessageBox::TYPE_OK,
