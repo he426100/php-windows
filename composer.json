@@ -1,23 +1,9 @@
 {
     "name": "he426100/php-windows",
     "type": "library",
-    "autoload": {
-        "files": [
-            "src/php-windows-helper/src/Functions.php"
-        ],
-        "psr-4": {
-            "He426100\\phpautogui\\": "src/phpautogui/src",
-            "He426100\\phpmsgbox\\": "src/phpmsgbox/src",
-            "He426100\\phpgetwindow\\": "src/phpgetwindow/src",
-            "Local\\Driver\\Win32\\": "src/driver-win32/src"
-        }
-    },
-    "replace": {
-        "he426100/phpautogui": "*",
-        "he426100/phpmsgbox": "*",
-        "he426100/phpgetwindow": "*",
-        "he426100/php-windows-helper": "*"
-    },
+    "repositories": [
+        {"type": "path", "url": "libs/*"}
+    ],
     "authors": [
         {
             "name": "he426100"
@@ -25,12 +11,29 @@
     ],
     "require": {
         "ext-ffi": "*",
-        "ffi/proxy": "^1.0"
+        "ffi/proxy": "^1.0",
+        "local/driver-win32": "^1.0"
     },
     "require-dev": {
         "pestphp/pest": "^2.28",
         "phpstan/phpstan": "^1.9",
         "psy/psysh": "^0.12.0"
+    },
+    "autoload": {
+        "files": [
+            "src/php-windows-helper/src/Functions.php"
+        ],
+        "psr-4": {
+            "He426100\\phpautogui\\": "src/phpautogui/src",
+            "He426100\\phpmsgbox\\": "src/phpmsgbox/src",
+            "He426100\\phpgetwindow\\": "src/phpgetwindow/src"
+        }
+    },
+    "replace": {
+        "he426100/phpautogui": "*",
+        "he426100/phpmsgbox": "*",
+        "he426100/phpgetwindow": "*",
+        "he426100/php-windows-helper": "*"
     },
     "suggest": {
         "skoro/tkui": "Required to use Tk."

@@ -6,6 +6,10 @@ namespace Local\Driver\Win32\Lib;
 
 use Local\Driver\Win32\Library;
 
+/**
+ * @link https://github.com/SerafimArts/Boson/
+ * @package Local\Driver\Win32\Lib
+ */
 final class Ole32 extends Library
 {
     public function __construct()

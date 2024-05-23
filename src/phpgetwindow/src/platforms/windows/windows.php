@@ -3,11 +3,10 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
-use string2wchar;
-use wchar2string;
-use point_in_rect;
-use He426100\phpgetwindow\phpgetwindow;
+use Local\Driver\Win32\Lib\User32;
 use He426100\phpgetwindow\platforms\platform;
+use function wchar2string;
+use function point_in_rect;
 
 final class windows implements platform
 {
@@ -15,11 +14,11 @@ final class windows implements platform
     public const FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
     public const FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
 
-    private ?FFI $ffi = null;
+    private ?User32 $ffi = null;
 
     public function __construct()
     {
-        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
+        $this->ffi = new User32();
     }
 
     public function getActiveWindow()
@@ -41,7 +40,7 @@ final class windows implements platform
         $this->ffi->EnumWindows(function ($hWnd, $lParam) use ($activeWindowHwnd, &$activeWindowTitle) {
             if ($hWnd == $activeWindowHwnd) {
                 $length = $this->ffi->GetWindowTextLengthW($hWnd);
-                $buffer = FFI::new("unsigned short[" . ($length + 1) . "]", false);
+                $buffer = $this->ffi->new('UINT16[' . ($length + 1). ']', false);
                 $this->ffi->GetWindowTextW($hWnd, $buffer, $length + 1);
                 $activeWindowTitle = wchar2string($buffer);
             }
@@ -99,7 +98,7 @@ final class windows implements platform
         $this->ffi->EnumWindows(function ($hWnd, $lParam) use (&$titles) {
             if ($this->ffi->IsWindowVisible($hWnd)) {
                 $length = $this->ffi->GetWindowTextLengthW($hWnd);
-                $titleBuffer = FFI::new("unsigned short[" . ($length + 1) . "]", false);
+                $titleBuffer = $this->ffi->new('UINT16[' . ($length + 1). ']', false);
                 $this->ffi->GetWindowTextW($hWnd, $titleBuffer, $length + 1);
                 $titles[] = [$hWnd, wchar2string($titleBuffer)];
             }

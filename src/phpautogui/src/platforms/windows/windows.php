@@ -3,9 +3,10 @@
 namespace He426100\phpautogui\platforms\windows;
 
 use FFI;
-use is_shift_character;
+use Local\Driver\Win32\Lib\User32;
 use He426100\phpautogui\phpautogui;
 use He426100\phpautogui\platforms\platform;
+use function is_shift_character;
 
 /**
  * 翻译自pyautogui_win.py
@@ -299,7 +300,7 @@ final class windows implements platform
         'launchapp2' => 0xb7, # VK_LAUNCH_APP2
     ];
 
-    private ?FFI $ffi = null;
+    private ?User32 $ffi = null;
 
     public function __construct()
     {
@@ -312,7 +313,7 @@ final class windows implements platform
 
         # Populate the basic printable ascii characters.
         # https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-vkkeyscana
-        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
+        $this->ffi = new User32();
 
         for ($c = 32; $c < 128; $c++) {
             $chr = chr($c);

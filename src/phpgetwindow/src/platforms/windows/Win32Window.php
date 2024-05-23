@@ -3,8 +3,9 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
-use wchar2string;
+use Local\Driver\Win32\Lib\User32;
 use He426100\phpgetwindow\BaseWindow;
+use function wchar2string;
 
 class Win32Window extends BaseWindow
 {
@@ -18,13 +19,13 @@ class Win32Window extends BaseWindow
 
     public const WM_CLOSE = 0x0010;
 
-    private ?FFI $ffi = null;
+    private ?User32 $ffi = null;
 
     protected $kernel;
 
     public function __construct(protected $hWnd)
     {
-        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
+        $this->ffi = new User32();
         $this->kernel = new kernel32();
     }
 
@@ -151,7 +152,7 @@ class Win32Window extends BaseWindow
     public function getTitle()
     {
         $textLenInCharacters = $this->ffi->GetWindowTextLengthW($this->hWnd);
-        $stringBuffer = FFI::new("unsigned short[" . ($textLenInCharacters + 1) . "]", false);
+        $stringBuffer = $this->ffi->new('UINT16[' . ($textLenInCharacters + 1) . ']', false);
         $this->ffi->GetWindowTextW($this->hWnd, $stringBuffer, $textLenInCharacters + 1);
         return wchar2string($stringBuffer);
     }

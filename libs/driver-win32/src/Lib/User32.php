@@ -6,6 +6,10 @@ namespace Local\Driver\Win32\Lib;
 
 use Local\Driver\Win32\Library;
 
+/**
+ * https://github.com/SerafimArts/Boson/
+ * @package Local\Driver\Win32\Lib
+ */
 final class User32 extends Library
 {
     public function __construct()
@@ -68,7 +72,7 @@ typedef char                CHAR;
 typedef CHAR                *LPSTR;
 typedef const CHAR          *LPCSTR;
 
-typedef char                WCHAR;
+typedef unsigned short      WCHAR;
 typedef WCHAR               TCHAR;
 
 typedef WCHAR               *LPWSTR;
@@ -115,6 +119,7 @@ typedef LONG                HRESULT;
 typedef WORD ATOM;
 
 // add by heyiming, for phpnput
+// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
 typedef HANDLE HHOOK;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -451,7 +456,11 @@ HBRUSH GetSysColorBrush(int nIndex);
 
 BOOL TranslateMessage(const MSG *lpMsg);
 
-// add by heyiming, for phpnput
+// add by heyiming, for phpmsgbox, winuser.h
+int MessageBoxA(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType);
+int MessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+
+// add by heyiming, for phpnput, winuser.h
 typedef struct tagMOUSEHOOKSTRUCT {
     POINT     pt;
     HWND      hwnd;
@@ -475,35 +484,31 @@ typedef struct tagKBDLLHOOKSTRUCT {
     ULONG_PTR dwExtraInfo;
 } KBDLLHOOKSTRUCT, *LPKBDLLHOOKSTRUCT, *PKBDLLHOOKSTRUCT;
 
-HHOOK SetWindowsHookExW(
-    int       idHook,
-    void (*)(int, WPARAM, LPARAM),
-    HINSTANCE hmod,
-    DWORD     dwThreadId
-);
+BOOL UnhookWindowsHook(int nCode, void (*)(int, WPARAM, LPARAM));
+HHOOK SetWindowsHookExA(int idHook, void (*)(int, WPARAM, LPARAM), HINSTANCE hmod, DWORD dwThreadId);
+HHOOK SetWindowsHookExW(int idHook, void (*)(int, WPARAM, LPARAM), HINSTANCE hmod, DWORD dwThreadId);
+BOOL UnhookWindowsHookEx(HANDLE hhk);
+LRESULT CallNextHookEx(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam);
 
-LRESULT CallNextHookEx(
-    HHOOK  hhk,
-    int    nCode,
-    WPARAM wParam,
-    LPARAM lParam
-);
+// add by heyiming, for phpautogui, winuser.h
+HWND GetDesktopWindow();
+BOOL GetCursorPos(POINT *lpPoint);
+BOOL SetCursorPos(int X, int Y);
+SHORT VkKeyScanA(CHAR ch);
 
-BOOL UnhookWindowsHookEx(
-    HANDLE hhk
-);
+void keybd_event(BYTE bVk, BYTE bScan, DWORD dwFlags, ULONG_PTR dwExtraInfo);
+void mouse_event(DWORD dwFlags, DWORD dx, DWORD dy, DWORD dwData, ULONG_PTR dwExtraInfo);
 
-BOOL GetMessageW(
-    LPMSG lpMsg,
-    HWND  hWnd,
-    UINT  wMsgFilterMin,
-    UINT  wMsgFilterMax
-);
-
-BOOL PeekMessageW(
-    LPMSG lpMsg,
-    HWND  hWnd,
-    UINT  wMsgFilterMin,
-    UINT  wMsgFilterMax,
-    UINT  wRemoveMsg
-);
+// add by heyiming, for phpgetwindow, winuser.h
+int GetWindowTextLengthA(HWND hWnd);
+int GetWindowTextLengthW(HWND hWnd);
+BOOL PostMessageA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+BOOL PostMessageW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+HWND GetForegroundWindow();
+BOOL SetForegroundWindow(HWND hWnd);
+BOOL AllowSetForegroundWindow(DWORD dwProcessId);
+BOOL LockSetForegroundWindow(UINT uLockCode);
+BOOL EnumWindows(void (*)(HWND, LPARAM), LPARAM);
+BOOL IsIconic(HWND hWnd);
+BOOL IsZoomed(HWND hWnd);
+BOOL IsWindowVisible(HWND hWnd);

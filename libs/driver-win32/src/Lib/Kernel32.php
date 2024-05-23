@@ -6,6 +6,10 @@ namespace Local\Driver\Win32\Lib;
 
 use Local\Driver\Win32\Library;
 
+/**
+ * @link https://github.com/SerafimArts/Boson/
+ * @package Local\Driver\Win32\Lib
+ */
 final class Kernel32 extends Library
 {
     public function __construct()
@@ -22,7 +26,7 @@ final class Kernel32 extends Library
 __halt_compiler();
 
 typedef char CHAR;
-typedef char WCHAR;
+typedef unsigned short WCHAR;
 typedef const CHAR *LPCSTR;
 typedef const WCHAR *LPCWSTR;
 typedef void *HINSTANCE;

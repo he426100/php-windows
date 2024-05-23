@@ -2,10 +2,10 @@
 
 namespace He426100\phpmsgbox\platforms\windows;
 
-use FFI;
-use string2wchar;
+use Local\Driver\Win32\Lib\User32;
 use He426100\phpmsgbox\phpmsgbox;
 use He426100\phpmsgbox\platforms\platform;
+use function string2wchar;
 
 final class windows implements platform
 {
@@ -48,11 +48,11 @@ final class windows implements platform
     public const IDTRYAGAIN = 0x10;
     public const IDYES = 0x6;
     
-    private ?FFI $ffi = null;
+    private ?User32 $ffi = null;
 
     public function __construct()
     {
-        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/windows.h'), 'user32.dll');
+        $this->ffi = new User32();
     }
 
     /**

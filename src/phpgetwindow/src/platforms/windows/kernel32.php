@@ -3,7 +3,8 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
-use wchar2string;
+use Local\Driver\Win32\Lib\Kernel32 as Kernel32Driver;
+use function wchar2string;
 
 final class kernel32
 {
@@ -18,11 +19,11 @@ final class kernel32
     public const FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
     public const FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
 
-    private ?FFI $ffi = null;
+    private ?Kernel32Driver $ffi = null;
 
     public function __construct()
     {
-        $this->ffi = FFI::cdef(file_get_contents(__DIR__ . '/kernel32.h'), 'kernel32.dll');
+        $this->ffi = new Kernel32Driver();
     }
 
     public function getAllProcess()
