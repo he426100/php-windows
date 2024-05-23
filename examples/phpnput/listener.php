@@ -1,19 +1,18 @@
 <?php
 /**
  * 先按 ESC，再按 CTRL+C 可退出脚本
- * 神奇，必须要下面这行require，否则移动鼠标时坐标会变但鼠标是不动的
- * 神奇，开启swow扩展的php.exe执行这个脚本，鼠标移动时坐标会变但鼠标是不动的
- * 神奇，静态php带swow扩展不需要下面这行require
  * 这个脚本还没写完，原版pynput用了thread，不知道怎么模拟
  */
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+use Local\Driver\Win32\Lib\Ole32;
 use Local\Driver\Win32\Lib\User32;
 use He426100\phpautogui\platforms\windows\windows;
 
 $windows = new windows;
 
+$ole32 = new Ole32();
 $ffi = new User32();
 
 // 定义全局变量来存储钩子句柄
@@ -43,6 +42,10 @@ const MK_XBUTTON2 = 0x0040;
 
 const XBUTTON1 = 1;
 const XBUTTON2 = 2;
+
+const COINIT_APARTMENTTHREADED = 0x02;
+
+$ole32->CoInitializeEx(null, COINIT_APARTMENTTHREADED);
 
 // 安装鼠标钩子
 $mouseHook = $ffi->SetWindowsHookExW(WH_MOUSE_LL, function ($nCode, $wParam, $lParam) {
@@ -90,9 +93,9 @@ while ($listen) {
         $ffi->TranslateMessage($msg);
         $ffi->DispatchMessageW($msg);
     }
-
     \usleep(1);
 }
 
 $ffi->UnhookWindowsHookEx($mouseHook);
 $ffi->UnhookWindowsHookEx($keyboardHook);
+$ole32->CoUninitialize();
