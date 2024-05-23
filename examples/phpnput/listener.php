@@ -84,14 +84,14 @@ $keyboardHook = $ffi->SetWindowsHookExW(WH_KEYBOARD_LL, function ($nCode, $wPara
     return $ffi->CallNextHookEx(null, $nCode, $wParam, $lParam);
 }, null, 0);
 
+$msg = FFI::addr($ffi->new("MSG"));
 while ($listen) {
-    $msg = $ffi->new("MSG");
-    while ($ffi->GetMessageW(FFI::addr($msg), null, 0, 0) !== 0) {
-        echo '我执行了1, ', $listen, PHP_EOL;
-        $ffi->PeekMessageW($msg);
-        echo '我执行了2, ', $listen, PHP_EOL;
+    if ($ffi->GetMessageW($msg, null, 0, 0)) {
+        $ffi->TranslateMessage($msg);
+        $ffi->DispatchMessageW($msg);
     }
-    echo '我执行了3, ', $listen, PHP_EOL;
+
+    \usleep(1);
 }
 
 $ffi->UnhookWindowsHookEx($mouseHook);
