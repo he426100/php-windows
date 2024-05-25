@@ -114,7 +114,7 @@ final class Application
             /* LPCSTR    lpClassName */
             string2wchar(__CLASS__, false),
             /* LPCSTR    lpWindowName */
-            string2wchar('hello', false),
+            string2wchar($info->title, false),
             /* DWORD     dwStyle */
             self::DEFAULT_WINDOW_STYLE,
             /* int       X */
