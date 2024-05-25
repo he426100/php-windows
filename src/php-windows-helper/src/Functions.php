@@ -1,15 +1,21 @@
 <?php
 
+use FFI\CData;
+
 if (!function_exists('string2wchar')) {
     /**
      * php string转windows wchar
      * 主要为MessageBoxW设计，无法使用php-ffi/scalar-utils的Type::wideString
+     * @param string $string 
+     * @param bool $owned 
+     * @param bool $persistent 
+     * @return CData|null 
      */
-    function string2wchar($string)
+    function string2wchar($string, bool $owned = true, bool $persistent = false)
     {
         $stringUtf16 = mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
         $length = \strlen($nullTerminated = $stringUtf16 . "\0\0");
-        $instance = \FFI::new("uint16_t[$length]");
+        $instance = \FFI::new("uint16_t[$length]", $owned, $persistent);
         \FFI::memcpy($instance, $nullTerminated, $length);
         return $instance;
     }

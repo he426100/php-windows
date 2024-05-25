@@ -47,6 +47,11 @@ class Win32Window extends BaseWindow
         }
     }
 
+    public function destroy()
+    {
+        $this->ffi->DestroyWindow($this->hWnd);
+    }
+
     public function minimize()
     {
         $this->ffi->ShowWindow($this->hWnd, self::SW_MINIMIZE);
@@ -65,6 +70,7 @@ class Win32Window extends BaseWindow
     public function show()
     {
         $this->ffi->ShowWindow($this->hWnd, self::SW_SHOW);
+        $this->ffi->UpdateWindow($this->hWnd);
     }
 
     public function hide()
