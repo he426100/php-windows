@@ -122,9 +122,9 @@ final class Application
             /* int       Y */
             self::CW_USER_DEFAULT,
             /* int       nWidth */
-            500,
+            $info->width,
             /* int       nHeight */
-            300,
+            $info->height,
             /* HWND      hWndParent */
             null,
             /* HMENU     hMenu */
