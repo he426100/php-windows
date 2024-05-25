@@ -6,6 +6,7 @@ use FFI\CData;
 use Local\Driver\Win32\Lib\Ole32;
 use Local\Driver\Win32\Lib\User32;
 use Local\Driver\Win32\Lib\Kernel32;
+use Local\Driver\Win32\Lib\Gdi32;
 use Local\Driver\Win32\Lib\WindowStyle;
 use Local\Driver\Win32\Lib\WindowExtendedStyle;
 use Local\Driver\Win32\Lib\WindowClassStyle;
@@ -13,6 +14,14 @@ use Local\Driver\Win32\Lib\Cursor;
 use Local\Driver\Win32\Lib\Icon;
 use Local\Driver\Win32\Lib\Color;
 use Local\Driver\Win32\Lib\WindowMessage;
+use Local\Driver\Win32\Lib\FontWeight;
+use Local\Driver\Win32\Lib\CharacterSet;
+use Local\Driver\Win32\Lib\OutPrecision;
+use Local\Driver\Win32\Lib\ClipPrecision;
+use Local\Driver\Win32\Lib\FontQuality;
+use Local\Driver\Win32\Lib\FamilyFont;
+use Local\Driver\Win32\Lib\PitchFont;
+use Local\Driver\Win32\Lib\TextDrawStyle;
 use He426100\phpgetwindow\platforms\windows\kernel32 as WinKernel32;
 use He426100\phpgetwindow\platforms\windows\Win32Window;
 
@@ -39,7 +48,8 @@ final class CreateInfo
         public bool $resizable = false,
         public bool $visible = true,
         public bool $debug = false,
-    ) {}
+    ) {
+    }
 }
 
 final class Application
@@ -53,6 +63,7 @@ final class Application
     private Ole32 $ole32;
     private User32 $user32;
     private Kernel32 $kernel32;
+    private Gdi32 $gdi32;
 
     private const DEFAULT_EX_WINDOW_STYLE = WindowExtendedStyle::WS_EX_LTRREADING
         | WindowExtendedStyle::WS_EX_LEFT
@@ -69,6 +80,7 @@ final class Application
         $this->ole32 = new Ole32();
         $this->user32 = new User32();
         $this->kernel32 = new Kernel32();
+        $this->gdi32 = new Gdi32();
         $this->message = $this->createMessage();
         $this->ole32->CoInitializeEx(null, self::COINIT_APARTMENTTHREADED);
     }
@@ -212,7 +224,7 @@ final class Application
                 return 0;
 
             case WindowMessage::WM_MOVE:
-                echo 'processWindow: WM_MOVE, ' . self::loWord($lParam) . ', ' . self::hiWord($lParam). PHP_EOL;
+                echo 'processWindow: WM_MOVE, ' . self::loWord($lParam) . ', ' . self::hiWord($lParam) . PHP_EOL;
                 return 0;
 
             case WindowMessage::WM_ACTIVATE:
@@ -230,6 +242,11 @@ final class Application
 
             case WindowMessage::WM_SIZE:
                 echo 'processWindow: WM_SIZE, ' . \max(0, self::loWord($lParam)) . ', ' . \max(0, self::hiWord($lParam)) . PHP_EOL;
+                return 0;
+
+            case WindowMessage::WM_PAINT:
+                echo 'processWindow: WM_PAINT' . PHP_EOL;
+                $this->drawTextInWindowCenter('PHP is the best language.'); // 在窗口中心绘制文字
                 return 0;
         }
         return null;
@@ -256,6 +273,42 @@ final class Application
     {
         // @phpstan-ignore-next-line
         return \FFI::addr($this->user32->new('MSG'));
+    }
+
+    /**
+     * @link https://www.cnblogs.com/mango1997/p/14628463.html
+     * @param string $text 
+     * @return void 
+     */
+    private function drawTextInWindowCenter(string $text): void
+    {
+        $ps = $this->user32->new('PAINTSTRUCT');
+        $hdc = $this->user32->BeginPaint($this->windows->getHwnd(), FFI::addr($ps));
+        $hFont = $this->gdi32->CreateFontW(
+            16, // 字体高度
+            0, // 字体宽度
+            0, // 倾斜角度
+            0, // 字符集
+            FontWeight::FW_NORMAL, // 字体权重
+            0, // 是否斜体
+            0, // 是否下划线
+            0, // 删除线
+            CharacterSet::DEFAULT_CHARSET, // 字符集标识
+            OutPrecision::OUT_TT_PRECIS, // 输出精度
+            ClipPrecision::CLIP_DEFAULT_PRECIS, // 剪切精度
+            FontQuality::DEFAULT_QUALITY, // 显示质量
+            FamilyFont::FF_DONTCARE | PitchFont::DEFAULT_PITCH, // 家族和间距
+            string2wchar('Arial', false) // 字体名
+        );
+        $this->gdi32->SelectObject($hdc, $hFont); // 选择字体
+        $this->gdi32->DeleteObject($hFont);
+
+        // 创建设备上下文并绘制文本
+        $this->gdi32->SetTextColor($hdc, 0x00000000); // 设置文本颜色
+        $this->gdi32->SetBkMode($hdc, 0x00FFFFFF); // 设置背景透明
+        $this->user32->DrawTextW($hdc, string2wchar($text, false), -1, FFI::addr($ps->rcPaint), TextDrawStyle::DT_CENTER | TextDrawStyle::DT_VCENTER | TextDrawStyle::DT_SINGLELINE);
+
+        $this->user32->EndPaint($this->windows->getHwnd(), FFI::addr($ps));
     }
 
     public function stop(): void

@@ -381,6 +381,7 @@ typedef struct tagLVCOLUMNW
 // ---------------------------------------------------------------------------------------------------------------------
 
 HDC GetDC(HWND hWnd);
+int ReleaseDC(HWND hWnd, HDC hDC);
 
 LRESULT DefWindowProcA(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 LRESULT DefWindowProcW(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
@@ -512,3 +513,31 @@ BOOL EnumWindows(void (*)(HWND, LPARAM), LPARAM);
 BOOL IsIconic(HWND hWnd);
 BOOL IsZoomed(HWND hWnd);
 BOOL IsWindowVisible(HWND hWnd);
+
+// add by heyiming, for phpwindow
+typedef struct tagPAINTSTRUCT {
+    HDC  hdc;
+    BOOL fErase;
+    RECT rcPaint;
+    BOOL fRestore;
+    BOOL fIncUpdate;
+    BYTE rgbReserved[32];
+} PAINTSTRUCT, *PPAINTSTRUCT, *NPPAINTSTRUCT, *LPPAINTSTRUCT;
+
+HDC BeginPaint(
+    HWND          hWnd,
+    LPPAINTSTRUCT lpPaint
+);
+
+int DrawTextW(
+    HDC     hdc,
+    LPCWSTR lpchText,
+    int     cchText,
+    LPRECT  lprc,
+    UINT    format
+);
+
+BOOL EndPaint(
+    HWND              hWnd,
+    const PAINTSTRUCT *lpPaint
+);
