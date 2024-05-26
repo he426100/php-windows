@@ -61,7 +61,7 @@ typedef char                CHAR;
 typedef CHAR                *LPSTR;
 typedef const CHAR          *LPCSTR;
 
-typedef unsigned short      WCHAR;
+typedef char      WCHAR;
 typedef WCHAR               TCHAR;
 
 typedef WCHAR               *LPWSTR;

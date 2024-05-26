@@ -2,10 +2,10 @@
 
 namespace He426100\phpmsgbox\platforms\windows;
 
+use Local\Com\WideString;
 use Local\Driver\Win32\Lib\User32;
 use He426100\phpmsgbox\phpmsgbox;
 use He426100\phpmsgbox\platforms\platform;
-use function string2wchar;
 
 final class windows implements platform
 {
@@ -66,7 +66,7 @@ final class windows implements platform
     public function alert($text, $title, $button = phpmsgbox::OK_TEXT, $icon = self::NO_ICON)
     {
         $text = (string)$text;
-        $this->ffi->MessageBoxW(0, string2wchar($text), string2wchar($title), self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
+        $this->ffi->MessageBoxW(0, WideString::toWideString($text), WideString::toWideString($title), self::MB_OK | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon);
         return $button;
     }
 
@@ -109,8 +109,8 @@ final class windows implements platform
         }
         $retVal = $this->ffi->MessageBoxW(
             0,
-            string2wchar($text),
-            string2wchar($title),
+            WideString::toWideString($text),
+            WideString::toWideString($title),
             $buttonFlag | self::MB_SETFOREGROUND | self::MB_TOPMOST | $icon
         );
         if ($retVal == self::IDOK || count($buttons) == 1) {

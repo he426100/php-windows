@@ -26,7 +26,7 @@ final class Kernel32 extends Library
 __halt_compiler();
 
 typedef char CHAR;
-typedef unsigned short WCHAR;
+typedef char WCHAR;
 typedef const CHAR *LPCSTR;
 typedef const WCHAR *LPCWSTR;
 typedef void *HINSTANCE;

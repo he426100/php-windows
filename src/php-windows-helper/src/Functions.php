@@ -2,56 +2,6 @@
 
 use FFI\CData;
 
-if (!function_exists('string2wchar')) {
-    /**
-     * php string转windows wchar
-     * 主要为MessageBoxW设计，无法使用php-ffi/scalar-utils的Type::wideString
-     * @param string $string 
-     * @param bool $owned 
-     * @param bool $persistent 
-     * @return CData|null 
-     */
-    function string2wchar($string, bool $owned = true, bool $persistent = false)
-    {
-        $stringUtf16 = mb_convert_encoding($string, 'UTF-16LE', 'UTF-8');
-        $length = \strlen($nullTerminated = $stringUtf16 . "\0\0");
-        $instance = \FFI::new("uint16_t[$length]", $owned, $persistent);
-        \FFI::memcpy($instance, $nullTerminated, $length);
-        return $instance;
-    }
-}
-
-if (!function_exists('wchar2string')) {
-    /**
-     * WCHAR 转 php string
-     * 复制自 php-ffi/scalar-utils
-     * @param CData $cdata 
-     * @param ?int $size 
-     * @return int|string 
-     */
-    function wchar2string($cdata, $size = null)
-    {
-        [$i, $result] = [0, ''];
-        if ($size !== null) {
-            for ($i = 0; $i < $size; ++$i) {
-                $char = $cdata[$i];
-                $result .= \is_int($char) ? \mb_chr($char) : $char;
-            }
-
-            return $result;
-        }
-        do {
-            $char = $cdata[$i];
-            if ($char === 0 || $char === "\0") {
-                return $result;
-            }
-            $result .= \is_int($char) ? \mb_chr($char) : $char;
-        } while (++$i);
-
-        return $result;
-    }
-}
-
 if (!function_exists('is_shift_character')) {
     /**
      * Returns True if the ``character`` is a keyboard key that would require the shift key to be held down, such as

@@ -2,7 +2,8 @@
 
 namespace He426100\phpgetwindow\platforms\windows;
 
-use function wchar2string;
+use FFI;
+use Local\Com\WideString;
 
 class Process32
 {
@@ -12,7 +13,7 @@ class Process32
 
     public function getTitle()
     {
-        return wchar2string($this->pe32->szExeFile);
+        return FFI::string($this->pe32->szExeFile);
     }
 
     public function __toString()

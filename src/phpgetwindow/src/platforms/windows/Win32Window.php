@@ -3,9 +3,9 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
+use Local\Com\WideString;
 use Local\Driver\Win32\Lib\User32;
 use He426100\phpgetwindow\BaseWindow;
-use function wchar2string;
 
 class Win32Window extends BaseWindow
 {
@@ -157,10 +157,10 @@ class Win32Window extends BaseWindow
 
     public function getTitle()
     {
-        $textLenInCharacters = $this->ffi->GetWindowTextLengthW($this->hWnd);
-        $stringBuffer = $this->ffi->new('UINT16[' . ($textLenInCharacters + 1) . ']', false);
-        $this->ffi->GetWindowTextW($this->hWnd, $stringBuffer, $textLenInCharacters + 1);
-        return wchar2string($stringBuffer);
+        $chars = $this->ffi->GetWindowTextLengthW($this->hWnd) + 1;
+        $buffer = $this->ffi->new('char[' . (2 * $chars) . ']');
+        $this->ffi->GetWindowTextW($this->hWnd, $buffer, $chars);
+        return WideString::fromWideString($buffer);
     }
 
     public function isVisible()

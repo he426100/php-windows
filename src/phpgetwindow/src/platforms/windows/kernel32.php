@@ -3,8 +3,8 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
+use Local\Com\WideString;
 use Local\Driver\Win32\Lib\Kernel32 as Kernel32Driver;
-use function wchar2string;
 
 final class kernel32
 {
@@ -37,7 +37,7 @@ final class kernel32
 
         // 设置 PROCESSENTRY32 结构的大小
         $pe32 = $this->ffi->new("PROCESSENTRY32");
-        $pe32->dwSize = $this->ffi::sizeof($pe32);
+        $pe32->dwSize = FFI::sizeof($pe32);
 
         // 遍历进程快照，获取进程信息
         if (!$this->ffi->Process32First($hProcessSnap, FFI::addr($pe32))) {
@@ -90,8 +90,7 @@ final class kernel32
             0, // nSize
             null
         );
-        $msg = rtrim(wchar2string($lpBuffer));
-        $this->ffi->LocalFree($lpBuffer);
+        $msg = rtrim(WideString::fromWideString($lpBuffer));
         return $msg;
     }
 }

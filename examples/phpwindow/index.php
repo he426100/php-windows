@@ -3,6 +3,7 @@
 require __DIR__ . '/../../vendor/autoload.php';
 
 use FFI\CData;
+use Local\Com\WideString;
 use Local\Driver\Win32\Lib\Ole32;
 use Local\Driver\Win32\Lib\User32;
 use Local\Driver\Win32\Lib\Kernel32;
@@ -124,9 +125,9 @@ final class Application
             /* DWORD     dwExStyle */
             self::DEFAULT_EX_WINDOW_STYLE,
             /* LPCSTR    lpClassName */
-            string2wchar(__CLASS__, false),
+            WideString::toWideString(__CLASS__),
             /* LPCSTR    lpWindowName */
-            string2wchar($info->title, false),
+            WideString::toWideString($info->title),
             /* DWORD     dwStyle */
             self::DEFAULT_WINDOW_STYLE,
             /* int       X */
@@ -200,7 +201,7 @@ final class Application
         $class->hIcon = $this->user32->LoadIconW(null, Icon::IDI_APPLICATION->toCData());
         $class->hInstance = $instance;
         $class->lpszMenuName = null;
-        $class->lpszClassName = string2wchar(__CLASS__, false);
+        $class->lpszClassName = WideString::toWideStringCData($this->user32, __CLASS__);
         $class->hbrBackground = $this->user32->GetSysColorBrush(Color::COLOR_WINDOW);
 
         /** @var CData */
@@ -298,7 +299,7 @@ final class Application
             ClipPrecision::CLIP_DEFAULT_PRECIS, // 剪切精度
             FontQuality::DEFAULT_QUALITY, // 显示质量
             FamilyFont::FF_DONTCARE | PitchFont::DEFAULT_PITCH, // 家族和间距
-            string2wchar('Arial', false) // 字体名
+            WideString::toWideString('Arial') // 字体名
         );
         $this->gdi32->SelectObject($hdc, $hFont); // 选择字体
         $this->gdi32->DeleteObject($hFont);
@@ -306,7 +307,7 @@ final class Application
         // 创建设备上下文并绘制文本
         $this->gdi32->SetTextColor($hdc, 0x00000000); // 设置文本颜色
         $this->gdi32->SetBkMode($hdc, 0x00FFFFFF); // 设置背景透明
-        $this->user32->DrawTextW($hdc, string2wchar($text, false), -1, FFI::addr($ps->rcPaint), TextDrawStyle::DT_CENTER | TextDrawStyle::DT_VCENTER | TextDrawStyle::DT_SINGLELINE);
+        $this->user32->DrawTextW($hdc, WideString::toWideString($text), -1, FFI::addr($ps->rcPaint), TextDrawStyle::DT_CENTER | TextDrawStyle::DT_VCENTER | TextDrawStyle::DT_SINGLELINE);
 
         $this->user32->EndPaint($this->windows->getHwnd(), FFI::addr($ps));
     }
