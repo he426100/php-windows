@@ -77,6 +77,10 @@ echo "所有窗口标题:\n";
 print_r($window->getAllTitles());
 ```
 
+- [创建窗口](https://github.com/he426100/php-windows/blob/main/examples/phpwindow/index.php)
+
+- [监听鼠标键盘](https://github.com/he426100/php-windows/blob/main/examples/phpnput/listener.php)
+
 ### 如何写cdef
 1. 数据类型  
 - [windows-data-types](https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types)  
