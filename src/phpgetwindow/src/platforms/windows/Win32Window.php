@@ -25,7 +25,7 @@ class Win32Window extends BaseWindow
 
     public function __construct(protected $hWnd)
     {
-        $this->ffi = new User32();
+        $this->ffi = User32::getInstance();
         $this->kernel = new kernel32();
     }
 

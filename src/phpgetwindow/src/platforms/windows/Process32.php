@@ -3,7 +3,6 @@
 namespace He426100\phpgetwindow\platforms\windows;
 
 use FFI;
-use Local\Com\WideString;
 
 class Process32
 {

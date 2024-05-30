@@ -23,7 +23,7 @@ final class kernel32
 
     public function __construct()
     {
-        $this->ffi = new Kernel32Driver();
+        $this->ffi = Kernel32Driver::getInstance();
     }
 
     public function getAllProcess()
